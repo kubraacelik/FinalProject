@@ -11,7 +11,6 @@ namespace ConsoleUI
 {
     internal class Program
     {
-        //SOLID
         //Open Closed Principle : yaptığın yazılıma yeni bir özellik ekliyorsan mevcuttaki hiç bir koduna dokunamazsın
         static void Main(string[] args)
         {
