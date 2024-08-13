@@ -9,6 +9,7 @@ namespace Core.Utilities.Business
 {
     public class BusinessRules
     {
+        //params, bir metoda değişken sayıda argüman geçilmesine olanak tanır.
         public static IResult Run(params IResult[] logics)
         {
             foreach (var logic in logics)
