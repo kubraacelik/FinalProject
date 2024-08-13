@@ -23,6 +23,7 @@ namespace Business.Concrete
 {
     public class ProductManager : IProductService
     {
+        //entity manager kendisi hariç başka dal'ı enjekte edemez! O yüzden service aldık
         IProductDal _productDal;
         ICategoryService _categoryService;
         
@@ -32,17 +33,17 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-                          //Claim
+        //Claim
         //[SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
         {
-            //Aynı isimde ürün eklenemez
-
+            //altta yazılan iş kurallarına uymasını istiyoruz
             IResult result = BusinessRules.Run(CheckIfProductNameExists(product.ProductName),
                 CheckIfProductCountOfCategoryCorrect(product.CategoryId),
                 CheckIfCategoryLimitExceded());
+
             if (result != null)
             {
                 return result;
@@ -103,9 +104,12 @@ namespace Business.Concrete
             return new SuccessResult(Messages.ProductUpdated);
         }
 
+
+
+        //private çünkü sadece bu class'ta kullanılsın istiyorum.
+        //seçilen kategori en fazla 15 ürün alabilir olarak güncellendi, ilerde sayı değişirse burdan değiştirmek yeterlidir.
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
         {
-            //Select count(*) from products where categoryId=1
             var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
             if (result >= 15)
             {
@@ -114,6 +118,8 @@ namespace Business.Concrete
             return new SuccessResult();
         }
 
+
+        //aynı isimde ürün eklenmesin
         private IResult CheckIfProductNameExists(string productName)
         {
             var result = _productDal.GetAll(p=> p.ProductName == productName).Any();
@@ -123,6 +129,9 @@ namespace Business.Concrete
             }
             return new SuccessResult(); 
         }
+
+
+        //kategori sayısı 15'i geçtiyse sisteme yeni ürün eklenemez
         private IResult CheckIfCategoryLimitExceded()
         {
             var result = _categoryService.GetAll();
@@ -132,6 +141,8 @@ namespace Business.Concrete
             }
             return new SuccessResult();
         }
+
+
 
         [TransactionScopeAspect]
         public IResult AddTransactionalTest(Product product)
