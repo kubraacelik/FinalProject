@@ -33,8 +33,8 @@ namespace Business.Concrete
             _categoryService = categoryService;
         }
 
-        //Claim
-        //[SecuredOperation("product.add,admin")]
+        //SecuredOperation metodunu çağıracak kişinin sahip olması gereken claimler:producta.add, admin
+        //[SecuredOperation("product.add,admin")] 
         [ValidationAspect(typeof(ProductValidator))]
         [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
