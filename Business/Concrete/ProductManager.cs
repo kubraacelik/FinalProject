@@ -26,17 +26,16 @@ namespace Business.Concrete
         //entity manager kendisi hariç başka dal'ı enjekte edemez! O yüzden service aldık
         IProductDal _productDal;
         ICategoryService _categoryService;
-        
+
         public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
             _categoryService = categoryService;
         }
 
-        //SecuredOperation metodunu çağıracak kişinin sahip olması gereken claimler:producta.add, admin
-        //[SecuredOperation("product.add,admin")] 
+        //[SecuredOperation("product.add,admin")] //SecuredOperation metodunu çağıracak kişinin sahip olması gereken claimler:producta.add, admin
         [ValidationAspect(typeof(ProductValidator))]
-        [CacheRemoveAspect("IProductService.Get")]
+        [CacheRemoveAspect("IProductService.Get")] //IProductService.Get içerenleri uçur demek
         public IResult Add(Product product)
         {
             //altta yazılan iş kurallarına uymasını istiyoruz
@@ -50,8 +49,8 @@ namespace Business.Concrete
             }
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
-            
-           
+
+
         }
 
         [CacheAspect] //key,value
@@ -61,7 +60,7 @@ namespace Business.Concrete
             {
                 return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
             }
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(),Messages.ProductsListed);
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(), Messages.ProductsListed);
 
         }
 
@@ -74,12 +73,11 @@ namespace Business.Concrete
         //[PerformanceAspect(5)]
         public IDataResult<Product> GetById(int productId)
         {
-            return new SuccessDataResult<Product>(_productDal.Get(p=>p.ProductId == productId));
+            return new SuccessDataResult<Product>(_productDal.Get(p => p.ProductId == productId));
         }
-
         public IDataResult<List<Product>> GetByUnitPrice(decimal min, decimal max)
         {
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=>p.UnitPrice >= min && p.UnitPrice <= max));
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.UnitPrice >= min && p.UnitPrice <= max));
         }
 
         public IDataResult<List<ProductDetailDto>> GetProductDetails()
@@ -104,8 +102,6 @@ namespace Business.Concrete
             return new SuccessResult(Messages.ProductUpdated);
         }
 
-
-
         //private çünkü sadece bu class'ta kullanılsın istiyorum.
         //seçilen kategori en fazla 15 ürün alabilir olarak güncellendi, ilerde sayı değişirse burdan değiştirmek yeterlidir.
         private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
@@ -118,18 +114,16 @@ namespace Business.Concrete
             return new SuccessResult();
         }
 
-
         //aynı isimde ürün eklenmesin
         private IResult CheckIfProductNameExists(string productName)
         {
-            var result = _productDal.GetAll(p=> p.ProductName == productName).Any();
+            var result = _productDal.GetAll(p => p.ProductName == productName).Any();
             if (result)
             {
                 return new ErrorResult(Messages.ProductNameAlreadyExists);
             }
-            return new SuccessResult(); 
+            return new SuccessResult();
         }
-
 
         //kategori sayısı 15'i geçtiyse sisteme yeni ürün eklenemez
         private IResult CheckIfCategoryLimitExceded()
@@ -141,8 +135,6 @@ namespace Business.Concrete
             }
             return new SuccessResult();
         }
-
-
 
         [TransactionScopeAspect]
         public IResult AddTransactionalTest(Product product)
