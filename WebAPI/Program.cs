@@ -23,10 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 //Autofac, Ninject , CastleWindsor , StructureMap , LightInject , DryInject --> IoC Container
-//Aop
-//Postsharp ücretli 
 builder.Services.AddControllers();
-
 
 var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
